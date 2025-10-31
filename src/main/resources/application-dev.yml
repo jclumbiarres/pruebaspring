@@ -1,0 +1,18 @@
+app:
+  cors:
+    allowed-origins:
+      - "*"
+    allow-credentials: false 
+  security:
+    jwt-secret: ${JWT_SECRET:xuwWmbISca4EfVJMjNuo9O9NLfnqAqCSmLLUj3leXME=}
+    jwt-expiration: 1h
+    token-prefix: Bearer
+
+spring:
+  h2:
+    console:
+      enabled: true
+
+logging:
+  level:
+    org.lumbi.ejercicio: DEBUG

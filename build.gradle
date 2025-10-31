@@ -1,0 +1,107 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.7'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'org.lumbi'
+version = '0.0.1-SNAPSHOT'
+description = 'Demo project for Spring Boot'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+ext {
+    profiles = {
+        dev {
+            springProfile = 'dev'
+            jvmArgs = ['-Xmx512m', '-Dspring.profiles.active=dev']
+        }
+        prod {
+            springProfile = 'prod'
+            jvmArgs = ['-Xmx1024m', '-Dspring.profiles.active=prod']
+        }
+    }
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.bouncycastle:bcprov-jdk18on:1.82'
+	runtimeOnly 'com.h2database:h2'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.mockito:mockito-core:5.20.0'
+	testImplementation 'org.mockito:mockito-inline:5.2.0'
+	testImplementation 'net.bytebuddy:byte-buddy-agent:1.17.8'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	// JWT para security
+    implementation 'io.jsonwebtoken:jjwt-api:0.13.0'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.13.0'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.13.0'
+	// OpenAPI Swagger
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
+}
+
+tasks.named('test') {
+    jvmArgs '-javaagent:' + configurations.testRuntimeClasspath.find { it.name.contains('byte-buddy-agent') }.absolutePath
+	useJUnitPlatform()
+}
+
+tasks.register('bootRunDev') {
+    group = 'application'
+    description = 'Run the application with dev profile'
+    doFirst {
+        tasks.bootRun.configure {
+            systemProperty 'spring.profiles.active', 'dev'
+            jvmArgs = ['-Xmx512m', '-Dspring.profiles.active=dev']
+        }
+    }
+    finalizedBy 'bootRun'
+}
+
+tasks.register('bootRunProd') {
+    group = 'application'
+    description = 'Run the application with prod profile'
+    doFirst {
+        tasks.bootRun.configure {
+            systemProperty 'spring.profiles.active', 'prod'
+            jvmArgs = ['-Xmx1024m', '-Dspring.profiles.active=prod']
+        }
+    }
+    finalizedBy 'bootRun'
+}
+
+tasks.register('generateJavadoc', Javadoc) {
+    group = 'documentation'
+    description = 'API Books'
+
+    source = sourceSets.main.allJava
+    classpath = sourceSets.main.compileClasspath
+
+    options.encoding = 'UTF-8'
+    options.charSet = 'UTF-8'
+    options.author = true
+    options.version = true
+    options.links("https://docs.oracle.com/en/java/javase/21/docs/api/")
+    options.memberLevel = JavadocMemberLevel.PUBLIC
+}
+
+
+bootRun {
+    systemProperty 'spring.profiles.active', findProperty('springProfile') ?: 'dev'
+    
+    if (project.hasProperty('jvmArgs')) {
+        jvmArgs = (project.jvmArgs as String).split('\\s+').toList()
+    }
+}

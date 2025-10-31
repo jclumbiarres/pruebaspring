@@ -1,0 +1,76 @@
+### REST Client de Huachao Mao para VSCode
+@baseUrl = http://192.168.88.27:8080/api
+@contentType = application/json
+
+### Registrar usuario
+# @name registerUser
+POST {{baseUrl}}/user/register HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "username": "testuser123",
+  "password": "P@ssw0rd!"
+}
+
+###
+
+### Autenticar usuario
+# @name authenticateUser
+POST {{baseUrl}}/user/auth HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+  "username": "testuser123",
+  "password": "P@ssw0rd!"
+}
+
+###
+
+@token = {{authenticateUser.response.body.accessToken}}
+
+### Obtener todos los libros
+GET {{baseUrl}}/books HTTP/1.1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+###
+
+### Obtener libro por ID
+GET {{baseUrl}}/books/1 HTTP/1.1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+###
+
+### Crear un nuevo libro
+# @name createBook
+POST {{baseUrl}}/books HTTP/1.1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "isbn": "{{$guid}}",
+  "bookname": "El Principito",
+  "publish_year": 1943,
+  "addedById": 1
+}
+
+###
+
+### Actualizar un libro existente
+PUT {{baseUrl}}/books/1 HTTP/1.1
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "id": 1,
+  "isbn": "1234567890",
+  "bookName": "El Principito (Edición Revisada)",
+  "publishYear": 2024
+}
+
+###
+
+### Eliminar un libro
+DELETE {{baseUrl}}/books/1 HTTP/1.1
+Authorization: Bearer {{token}}

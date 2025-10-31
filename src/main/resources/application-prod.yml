@@ -1,0 +1,15 @@
+app:
+  cors:
+    allowed-origins: ${ALLOWED_ORIGINS}
+    allow-credentials: true
+  security:
+    jwt-secret: ${JWT_SECRET} 
+
+spring:
+  h2:
+    console:
+      enabled: false
+
+logging:
+  level:
+    org.lumbi.ejercicio: INFO
